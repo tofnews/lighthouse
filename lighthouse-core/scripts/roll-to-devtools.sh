@@ -31,7 +31,7 @@ else
   echo -e "$check Chromium folder in place."
 fi
 
-fe_lh_dir="$dt_dir/third_party/lighthouse"
+fe_lh_dir="$dt_dir/front_end/third_party/lighthouse"
 mkdir -p "$fe_lh_dir"
 
 lh_bg_js="dist/lighthouse-dt-bundle.js"
