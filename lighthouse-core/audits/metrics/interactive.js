@@ -86,7 +86,7 @@ class InteractiveMetric extends Audit {
         scoreOptions.scoreMedian
       ),
       numericValue: timeInMs,
-      numericUnit: 'milliseconds',
+      numericUnit: 'millisecond',
       displayValue: str_(i18n.UIStrings.seconds, {timeInMs}),
       extendedInfo: {
         value: extendedInfo,

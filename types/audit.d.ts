@@ -94,8 +94,8 @@ declare global {
     interface NumericProduct extends ProductBase {
       /** A numeric value that has a meaning specific to the audit, e.g. the number of nodes in the DOM or the timestamp of a specific load event. More information can be found in the audit details, if present. */
       numericValue: number;
-      /** The unit of `numericValue`, used when the consumer wishes to convert numericValue to a display string. */
-      numericUnit: 'bytes'|'milliseconds'|'elements';
+      /** The unit of `numericValue`, used when the consumer wishes to convert numericValue to a display string. A superset of https://tc39.es/proposal-unified-intl-numberformat/section6/locales-currencies-tz_proposed_out.html#sec-issanctionedsimpleunitidentifier */
+      numericUnit: 'byte'|'millisecond'|'element';
     }
 
     /** Type returned by Audit.audit(). Only score is required.  */

@@ -211,7 +211,7 @@ class UnusedBytes extends Audit {
       warnings: result.warnings,
       displayValue,
       numericValue: wastedMs,
-      numericUnit: 'milliseconds',
+      numericUnit: 'millisecond',
       score: UnusedBytes.scoreForWastedMs(wastedMs),
       extendedInfo: {
         value: {
