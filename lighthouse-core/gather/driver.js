@@ -113,7 +113,7 @@ class Driver {
       // Not mandatory but not used much
       'blink.console',
 
-      // Most the events we need come in on these three
+      // Most of the events we need are from these three
       'devtools.timeline',
       'devtools.timeline.async',
       'disabled-by-default-devtools.timeline',
