@@ -15,13 +15,6 @@ const errorTrace = require('../fixtures/traces/no_fmp_event.json');
 
 describe('Performance: bootup-time audit', () => {
   const auditOptions = Object.assign({}, BootupTime.defaultOptions, {thresholdInMs: 10});
-  const roundedValueOf = (output, url) => {
-    const value = output.details.items.find(item => item.url === url);
-    const roundedValue = {};
-    Object.keys(value).forEach(key => (roundedValue[key] = Math.round(value[key] * 10) / 10));
-    delete roundedValue.url;
-    return roundedValue;
-  };
 
   it('should compute the correct BootupTime values', () => {
     const artifacts = Object.assign({
@@ -37,7 +30,7 @@ Array [
     "scriptParseCompile": 0.022,
     "scripting": 7.619999999999981,
     "total": 1025.2669999999957,
-    "url": "Other",
+    "url": "Unattributable",
   },
   Object {
     "scriptParseCompile": 6.469,
@@ -95,7 +88,7 @@ Array [
     "scriptParseCompile": 0.066,
     "scripting": 22.859999999999943,
     "total": 3075.8009999999867,
-    "url": "Other",
+    "url": "Unattributable",
   },
   Object {
     "scriptParseCompile": 19.407,
@@ -131,7 +124,7 @@ Array [
     "scriptParseCompile": 0,
     "scripting": 0,
     "total": 23.897999999999996,
-    "url": "Chrome",
+    "url": "Browser GC",
   },
   Object {
     "scriptParseCompile": 8.943,

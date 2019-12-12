@@ -497,7 +497,7 @@ class MainThreadTasks {
 
     /** @type {string[]} */
     const attributableURLs = Array.from(parentURLs);
-    for (const url of taskURLs.concat(stackFrameURLs)) {
+    for (const url of [...taskURLs, ...stackFrameURLs]) {
       // Don't add empty URLs
       if (!url) continue;
       // Add unique URLs to our overall tree.
