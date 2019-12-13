@@ -109,6 +109,7 @@ function upperBound(object, comparator, left, right) {
  * @template T,S
  */
 function lowerBound(object, comparator, left, right) {
+  // @ts-ignore
   function defaultComparator(a, b) {
     return a < b ? -1 : (a > b ? 1 : 0);
   }
