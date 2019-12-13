@@ -33,7 +33,7 @@ for (const [input, output] of Object.entries(files)) {
     let newLine = line;
 
     if (input.endsWith('SourceMap.js')) {
-      if (line.includes('static load(')) deletionMode = true;
+      if (line.includes('static async load(')) deletionMode = true;
       if (line.includes('sourceContentProvider(')) deletionMode = true;
       if (line.includes('Common.UIString')) newLine = '';
       if (line.includes('export class WasmSourceMap')) deletionMode = true;

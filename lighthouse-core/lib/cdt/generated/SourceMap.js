@@ -216,25 +216,6 @@ const TextSourceMap = module.exports.TextSourceMap = class TextSourceMap {
    * @return {!Promise<?TextSourceMap>}
    * @this {TextSourceMap}
    */
-  static async load(sourceMapURL, compiledURL) {
-    let content = await new Promise((resolve, reject) => {
-      SDK.multitargetNetworkManager.loadResource(sourceMapURL, (statusCode, _headers, content) => {
-        if (!content || statusCode >= 400) {
-          const error = new Error(ls`Could not load content for ${sourceMapURL} : HTTP status code: ${statusCode}`);
-          reject(error);
-        } else {
-          resolve(content);
-        }
-      });
-    });
-
-    if (content.slice(0, 3) === ')]}') {
-      content = content.substring(content.indexOf('\n'));
-    }
-
-    const payload = /** @type {!SourceMapV3} */ (JSON.parse(content));
-    return new TextSourceMap(compiledURL, sourceMapURL, payload);
-  }
 
   /**
    * @override
