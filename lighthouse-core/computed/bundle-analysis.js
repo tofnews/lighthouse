@@ -42,14 +42,14 @@ function computeGeneratedFileSizes(map, content) {
     // https://github.com/mozilla/source-map/pull/303
     if (!source) continue;
 
-    // Lines are 1-based
+    // Lines and columns are zero-based indices. Visually, lines are shown as a 1-based index.
+
     const line = lines[lineNum];
     if (line === null) {
       log.error('BundleAnalysis', `${map.url()} mapping for line out of bounds: ${lineNum + 1}`);
       return failureResult;
     }
 
-    // Columns are 0-based
     if (colNum > line.length) {
       // eslint-disable-next-line max-len
       log.error('BundleAnalysis', `${map.url()} mapping for column out of bounds: ${lineNum + 1}:${colNum}`);
