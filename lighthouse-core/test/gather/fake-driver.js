@@ -109,6 +109,8 @@ const fakeDriverUsingRealMobileDevice = makeFakeDriver({
   },
 });
 
-module.exports = fakeDriver;
-module.exports.fakeDriverUsingRealMobileDevice = fakeDriverUsingRealMobileDevice;
-module.exports.protocolGetVersionResponse = protocolGetVersionResponse;
+module.exports = {
+  ...fakeDriver,
+  fakeDriverUsingRealMobileDevice,
+  protocolGetVersionResponse,
+};

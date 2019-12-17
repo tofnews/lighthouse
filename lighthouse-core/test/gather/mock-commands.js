@@ -22,7 +22,7 @@
  */
 function createMockSendCommandFn() {
   const mockResponses = [];
-  const mockFn = jest.fn().mockImplementation((command, sessionId, ...args) => {
+  const mockFnImpl = jest.fn().mockImplementation((command, sessionId, ...args) => {
     const indexOfResponse = mockResponses
       .findIndex(entry => entry.command === command && entry.sessionId === sessionId);
     if (indexOfResponse === -1) throw new Error(`${command} unimplemented`);
@@ -33,20 +33,37 @@ function createMockSendCommandFn() {
     return Promise.resolve(returnValue);
   });
 
-  mockFn.mockResponse = (command, response, delay) => {
-    mockResponses.push({command, response, delay});
-    return mockFn;
-  };
-
-  mockFn.mockResponseToSession = (command, sessionId, response, delay) => {
-    mockResponses.push({command, sessionId, response, delay});
-    return mockFn;
-  };
-
-  mockFn.findInvocation = (command, sessionId) => {
-    expect(mockFn).toHaveBeenCalledWith(command, sessionId, expect.anything());
-    return mockFn.mock.calls.find(call => call[0] === command && call[1] === sessionId)[2];
-  };
+  const mockFn = Object.assign(mockFnImpl, {
+    /**
+     * @template {keyof LH.CrdpCommands} C
+     * @param {C} command
+     * @param {RecursivePartial<LH.CrdpCommands[C]['returnType']>=} response
+     * @param {number=} delay
+     */
+    mockResponse(command, response, delay) {
+      mockResponses.push({command, response, delay});
+      return mockFn;
+    },
+    /**
+     * @template {keyof LH.CrdpCommands} C
+     * @param {C} command
+     * @param {string} sessionId
+     * @param {RecursivePartial<LH.CrdpCommands[C]['returnType']>=} response
+     * @param {number=} delay
+     */
+    mockResponseToSession(command, sessionId, response, delay) {
+      mockResponses.push({command, sessionId, response, delay});
+      return mockFn;
+    },
+    /**
+     * @param {keyof LH.CrdpCommands} command
+     * @param {string=} sessionId
+     */
+    findInvocation(command, sessionId) {
+      expect(mockFn).toHaveBeenCalledWith(command, sessionId, expect.anything());
+      return mockFn.mock.calls.find(call => call[0] === command && call[1] === sessionId)[2];
+    },
+  });
 
   return mockFn;
 }
@@ -62,7 +79,7 @@ function createMockSendCommandFn() {
  */
 function createMockOnceFn() {
   const mockEvents = [];
-  const mockFn = jest.fn().mockImplementation((eventName, listener) => {
+  const mockFnImpl = jest.fn().mockImplementation((eventName, listener) => {
     const indexOfResponse = mockEvents.findIndex(entry => entry.event === eventName);
     if (indexOfResponse === -1) return;
     const {response} = mockEvents[indexOfResponse];
@@ -71,15 +88,25 @@ function createMockOnceFn() {
     setTimeout(() => listener(response), 0);
   });
 
-  mockFn.mockEvent = (event, response) => {
-    mockEvents.push({event, response});
-    return mockFn;
-  };
-
-  mockFn.findListener = event => {
-    expect(mockFn).toHaveBeenCalledWith(event, expect.anything());
-    return mockFn.mock.calls.find(call => call[0] === event)[1];
-  };
+  const mockFn = Object.assign(mockFnImpl, {
+    ...mockFnImpl,
+    /**
+     * @template {keyof LH.CrdpEvents} E
+     * @param {E} event
+     * @param {RecursivePartial<LH.CrdpEvents[E][0]>} response
+     */
+    mockEvent(event, response) {
+      mockEvents.push({event, response});
+      return mockFn;
+    },
+    /**
+     * @param {keyof LH.CrdpEvents} event
+     */
+    findListener(event) {
+      expect(mockFn).toHaveBeenCalledWith(event, expect.anything());
+      return mockFn.mock.calls.find(call => call[0] === event)[1];
+    },
+  });
 
   return mockFn;
 }
@@ -90,7 +117,7 @@ function createMockOnceFn() {
  */
 function createMockOnFn() {
   const mockEvents = [];
-  const mockFn = jest.fn().mockImplementation((eventName, listener) => {
+  const mockFnImpl = jest.fn().mockImplementation((eventName, listener) => {
     const events = mockEvents.filter(entry => entry.event === eventName);
     if (!events.length) return;
     for (const event of events) {
@@ -105,15 +132,25 @@ function createMockOnFn() {
     }, 0);
   });
 
-  mockFn.mockEvent = (event, response) => {
-    mockEvents.push({event, response});
-    return mockFn;
-  };
-
-  mockFn.findListener = event => {
-    expect(mockFn).toHaveBeenCalledWith(event, expect.anything());
-    return mockFn.mock.calls.find(call => call[0] === event)[1];
-  };
+  const mockFn = Object.assign(mockFnImpl, {
+    ...mockFnImpl,
+    /**
+     * @template {keyof LH.CrdpEvents} E
+     * @param {E} event
+     * @param {RecursivePartial<LH.CrdpEvents[E][0]>} response
+     */
+    mockEvent(event, response) {
+      mockEvents.push({event, response});
+      return mockFn;
+    },
+    /**
+     * @param {keyof LH.CrdpEvents} event
+     */
+    findListener(event) {
+      expect(mockFn).toHaveBeenCalledWith(event, expect.anything());
+      return mockFn.mock.calls.find(call => call[0] === event)[1];
+    },
+  });
 
   return mockFn;
 }
