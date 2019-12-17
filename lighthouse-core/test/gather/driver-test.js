@@ -647,7 +647,6 @@ describe('.gotoURL', () => {
 
 describe('._waitForFCP', () => {
   it('should not resolve until FCP fires', async () => {
-    // @ts-ignore
     driver.on = driver.once = createMockOnceFn();
 
     const waitPromise = makePromiseInspectable(driver._waitForFCP(60 * 1000).promise);
@@ -667,7 +666,6 @@ describe('._waitForFCP', () => {
   });
 
   it('should timeout', async () => {
-    // @ts-ignore
     driver.on = driver.once = createMockOnceFn();
 
     const waitPromise = makePromiseInspectable(driver._waitForFCP(5000).promise);
@@ -682,7 +680,6 @@ describe('._waitForFCP', () => {
   });
 
   it('should be cancellable', async () => {
-    // @ts-ignore
     driver.on = driver.once = createMockOnceFn();
     driver.off = jest.fn();
 
