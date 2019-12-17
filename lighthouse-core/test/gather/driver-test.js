@@ -329,8 +329,8 @@ describe('.beginTrace', () => {
   it('will adjust traceCategories based on chrome version', async () => {
     connectionStub.sendCommand = createMockSendCommandFn()
       .mockResponse('Browser.getVersion', {product: 'Chrome/70.0.3577.0'})
-      .mockResponse('Page.enable', {})
-      .mockResponse('Tracing.start', {});
+      .mockResponse('Page.enable')
+      .mockResponse('Tracing.start');
 
     await driver.beginTrace();
 
