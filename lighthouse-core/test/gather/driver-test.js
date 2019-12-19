@@ -95,13 +95,13 @@ let driver;
 let connectionStub;
 
 beforeEach(() => {
-  // @ts-ignore
+  // @ts-ignore - connectionStub has a mocked version of sendCommand implemented in each test
   connectionStub = new Connection();
   // @ts-ignore
   connectionStub.sendCommand = cmd => {
     throw new Error(`${cmd} not implemented`);
   };
-  // @ts-ignore
+  // @ts-ignore - driver has a mocked version of on/once  implemented in each test
   driver = new Driver(connectionStub);
 });
 
@@ -540,7 +540,7 @@ describe('.gotoURL', () => {
         driver._waitForNetworkIdle = createMockWaitForFn();
         driver._waitForCPUIdle = createMockWaitForFn();
 
-        // @ts-ignore
+        // @ts-ignore - dynamic property access, tests will definitely fail if the property were to change
         const waitForResult = driver[`_waitFor${name}`];
         const otherWaitForResults = [
           driver._waitForFCP,
