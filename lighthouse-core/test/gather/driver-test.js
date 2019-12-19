@@ -11,7 +11,8 @@ const LHElement = require('../../lib/lh-element.js');
 const {protocolGetVersionResponse} = require('./fake-driver.js');
 const {createMockSendCommandFn, createMockOnceFn} = require('./mock-commands.js');
 
-const redirectDevtoolsLog = require('../fixtures/wikipedia-redirect.devtoolslog.json');
+const redirectDevtoolsLog = /** @type {LH.Protocol.RawEventMessage[]} */ (
+  require('../fixtures/wikipedia-redirect.devtoolslog.json'));
 
 /* eslint-env jest */
 
@@ -248,7 +249,7 @@ describe('.evaluateAsync', () => {
 
     // Check that we used the correct frame when creating the isolated context
     const createWorldArgs = connectionStub.sendCommand.findInvocation('Page.createIsolatedWorld');
-    expect(createWorldArgs).toMatchObject({frameId: 1337});
+    expect(createWorldArgs).toMatchObject({frameId: '1337'});
 
     // Check that we used the isolated context when evaluating
     const evaluateArgs = connectionStub.sendCommand.findInvocation('Runtime.evaluate');
@@ -462,7 +463,6 @@ describe('.gotoURL', () => {
         return Promise.resolve();
       }
       replayLog() {
-        // @ts-ignore
         redirectDevtoolsLog.forEach(msg => this.emitProtocolEvent(msg));
       }
       /**
@@ -604,7 +604,7 @@ describe('.gotoURL', () => {
       driver._waitForNetworkIdle = createMockWaitForFn();
       driver._waitForCPUIdle = createMockWaitForFn();
 
-      // @ts-ignore
+      // @ts-ignore: Allow partial passContext.
       const loadPromise = makePromiseInspectable(driver.gotoURL(url, {
         waitForLoad: true,
         passContext: {
@@ -905,7 +905,6 @@ describe('Domain.enable/disable State', () => {
     connectionStub.sendCommand = createMockSendCommandFn()
       .mockResponse('Network.enable')
       .mockResponse('Network.disable')
-      // @ts-ignore: Fetch is not in protocol typings yet.
       .mockResponse('Fetch.enable')
       .mockResponse('Fetch.disable');
 
@@ -917,16 +916,14 @@ describe('Domain.enable/disable State', () => {
     expect(connectionStub.sendCommand).toHaveBeenCalledTimes(1);
     // Network still has one enable.
 
-    // @ts-ignore: Fetch is not in protocol typings yet.
-    await driver.sendCommand('Fetch.enable', {});
+    await driver.sendCommand('Fetch.enable');
     expect(connectionStub.sendCommand).toHaveBeenCalledTimes(2);
 
     await driver.sendCommand('Network.disable');
     expect(connectionStub.sendCommand).toHaveBeenCalledTimes(3);
     // Network is now disabled.
 
-    // @ts-ignore: Fetch is not in protocol typings yet.
-    await driver.sendCommand('Fetch.disable', {});
+    await driver.sendCommand('Fetch.disable');
     expect(connectionStub.sendCommand).toHaveBeenCalledTimes(4);
   });
 
