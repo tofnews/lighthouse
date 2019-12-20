@@ -5,6 +5,9 @@
  */
 'use strict';
 
+/**
+ * @param {{protocolGetVersionResponse: LH.CrdpCommands['Browser.getVersion']['returnType']}} param0
+ */
 function makeFakeDriver({protocolGetVersionResponse}) {
   let scrollPosition = {x: 0, y: 0};
 
@@ -59,6 +62,7 @@ function makeFakeDriver({protocolGetVersionResponse}) {
     evaluateAsync() {
       return Promise.resolve({});
     },
+    /** @param {{x: number, y: number}} position */
     scrollTo(position) {
       scrollPosition = position;
       return Promise.resolve();

@@ -147,7 +147,7 @@ function createMockOnceFn() {
 function createMockOnFn() {
   /**
    * @template {keyof LH.CrdpEvents} E
-   * @type {Array<{event: E, response?: MockEvent<E>}>}
+   * @type {Array<{event: E|any, response?: MockEvent<E>}>}
    */
   const mockEvents = [];
   const mockFnImpl = jest.fn().mockImplementation((eventName, listener) => {
