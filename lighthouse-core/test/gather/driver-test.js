@@ -57,6 +57,37 @@ function makePromiseInspectable(promise) {
   });
 }
 
+function createDecomposedPromise() {
+  /** @type {Function} */
+  let resolve;
+  /** @type {Function} */
+  let reject;
+  const promise = new Promise((r1, r2) => {
+    resolve = r1;
+    reject = r2;
+  });
+  // @ts-ignore: Ignore 'unused' error.
+  return {promise, resolve, reject};
+}
+
+function createMockWaitForFn() {
+  const {promise, resolve, reject} = createDecomposedPromise();
+
+  const mockCancelFn = jest.fn();
+  const mockFn = jest.fn().mockReturnValue({promise, cancel: mockCancelFn});
+
+  return Object.assign(mockFn, {
+    mockResolve: resolve,
+    /** @param {Error=} err */
+    mockReject(err) {
+      reject(err || new Error('Rejected'));
+    },
+    getMockCancelFn() {
+      return mockCancelFn;
+    },
+  });
+}
+
 expect.extend({
   /**
    * Asserts that an inspectable promise created by makePromiseInspectable is currently resolved or rejected.
@@ -90,7 +121,17 @@ async function flushAllTimersAndMicrotasks() {
   }
 }
 
-/** @type {Driver & {on: ReturnType<typeof createMockOnceFn>, once: ReturnType<typeof createMockOnceFn>}} */
+/**
+ * @typedef DriverMockMethods
+ * @property {ReturnType<typeof createMockOnceFn>} on
+ * @property {ReturnType<typeof createMockOnceFn>} once
+ * @property {ReturnType<typeof createMockWaitForFn>} _waitForFCP
+ * @property {ReturnType<typeof createMockWaitForFn>} _waitForLoadEvent
+ * @property {ReturnType<typeof createMockWaitForFn>} _waitForNetworkIdle
+ * @property {ReturnType<typeof createMockWaitForFn>} _waitForCPUIdle
+*/
+
+/** @type {Driver & DriverMockMethods} */
 let driver;
 /** @type {Connection & {sendCommand: ReturnType<typeof createMockSendCommandFn>}} */
 let connectionStub;
@@ -272,7 +313,7 @@ describe('.evaluateAsync', () => {
       .mockResponse('Page.getResourceTree', {frameTree: {frame: {id: '1337'}}})
       .mockResponse('Page.createIsolatedWorld', {executionContextId: 9001})
       .mockResponse('Runtime.evaluate', Promise.reject(new Error('Cannot find context')))
-      .mockResponse('Page.getResourceTree', {frameTree: {frame: {id: 1337}}})
+      .mockResponse('Page.getResourceTree', {frameTree: {frame: {id: '1337'}}})
       .mockResponse('Page.createIsolatedWorld', {executionContextId: 9002})
       .mockResponse('Runtime.evaluate', {result: {value: 'mocked value'}});
 
@@ -346,10 +387,8 @@ describe('.beginTrace', () => {
 
 describe('.setExtraHTTPHeaders', () => {
   it('should Network.setExtraHTTPHeaders when there are extra-headers', async () => {
-    connectionStub.sendCommand = createMockSendCommandFn().mockResponse(
-      'Network.setExtraHTTPHeaders',
-      {}
-    );
+    connectionStub.sendCommand = createMockSendCommandFn()
+      .mockResponse('Network.setExtraHTTPHeaders');
 
     await driver.setExtraHTTPHeaders({
       'Cookie': 'monster',
@@ -425,24 +464,6 @@ describe('.goOffline', () => {
 });
 
 describe('.gotoURL', () => {
-  function createMockWaitForFn() {
-    let resolve;
-    let reject;
-    const promise = new Promise((r1, r2) => {
-      resolve = r1;
-      reject = r2;
-    });
-
-    const mockCancelFn = jest.fn();
-    const mockFn = jest.fn().mockReturnValue({promise, cancel: mockCancelFn});
-
-    mockFn.mockResolve = () => resolve();
-    mockFn.mockReject = err => reject(err || new Error('Rejected'));
-    mockFn.getMockCancelFn = () => mockCancelFn;
-
-    return mockFn;
-  }
-
   beforeEach(() => {
     connectionStub.sendCommand = createMockSendCommandFn()
       .mockResponse('Network.enable')

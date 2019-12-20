@@ -37,7 +37,7 @@ function createMockSendCommandFn() {
     /**
      * @template {keyof LH.CrdpCommands} C
      * @param {C} command
-     * @param {RecursivePartial<LH.CrdpCommands[C]['returnType']>=} response
+     * @param {RecursivePartial<LH.CrdpCommands[C]['returnType']> | Promise<Error>=} response
      * @param {number=} delay
      */
     mockResponse(command, response, delay) {
