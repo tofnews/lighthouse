@@ -12,6 +12,16 @@
 /* eslint-env jest */
 
 /**
+ * @template {keyof LH.CrdpCommands} C
+ * @typedef {((...args: LH.CrdpCommands[C]['paramsType']) => MockResponse<C>) | RecursivePartial<LH.CrdpCommands[C]['returnType']> | Promise<Error>} MockResponse
+ */
+
+/**
+ * @template {keyof LH.CrdpEvents} E
+ * @typedef {RecursivePartial<LH.CrdpEvents[E][0]>} MockEvent
+ */
+
+/**
  * Creates a jest mock function whose implementation consumes mocked protocol responses matching the
  * requested command in the order they were mocked.
  *
@@ -21,23 +31,38 @@
  *      returns the protocol message argument.
  */
 function createMockSendCommandFn() {
+  /**
+   * Typescript fails to equate template type `C` here with `C` when pushing to this array.
+   * Instead of sprinkling a couple ts-ignores, make `command` be any, but leave `C` for just
+   * documentation purposes. This is an internal type, so it doesn't matter much.
+   * @template {keyof LH.CrdpCommands} C
+   * @type {Array<{command: C|any, sessionId?: string, response?: MockResponse<C>, delay?: number}>}
+   */
   const mockResponses = [];
-  const mockFnImpl = jest.fn().mockImplementation((command, sessionId, ...args) => {
-    const indexOfResponse = mockResponses
-      .findIndex(entry => entry.command === command && entry.sessionId === sessionId);
-    if (indexOfResponse === -1) throw new Error(`${command} unimplemented`);
-    const {response, delay} = mockResponses[indexOfResponse];
-    mockResponses.splice(indexOfResponse, 1);
-    const returnValue = typeof response === 'function' ? response(...args) : response;
-    if (delay) return new Promise(resolve => setTimeout(() => resolve(returnValue), delay));
-    return Promise.resolve(returnValue);
-  });
+  const mockFnImpl = jest.fn().mockImplementation(
+    /**
+     * @template {keyof LH.CrdpCommands} C
+     * @param {C} command
+     * @param {string|undefined=} sessionId
+     * @param {LH.CrdpCommands[C]['paramsType']} args
+     */
+    (command, sessionId, ...args) => {
+      const indexOfResponse = mockResponses
+        .findIndex(entry => entry.command === command && entry.sessionId === sessionId);
+      if (indexOfResponse === -1) throw new Error(`${command} unimplemented`);
+      const {response, delay} = mockResponses[indexOfResponse];
+      mockResponses.splice(indexOfResponse, 1);
+      const returnValue = typeof response === 'function' ? response(...args) : response;
+      if (delay) return new Promise(resolve => setTimeout(() => resolve(returnValue), delay));
+      // @ts-ignore: Some covariant type stuff doesn't work here. idk, I'm not a type scientist.
+      return Promise.resolve(returnValue);
+    });
 
   const mockFn = Object.assign(mockFnImpl, {
     /**
      * @template {keyof LH.CrdpCommands} C
      * @param {C} command
-     * @param {RecursivePartial<LH.CrdpCommands[C]['returnType']> | Promise<Error>=} response
+     * @param {MockResponse<C>=} response
      * @param {number=} delay
      */
     mockResponse(command, response, delay) {
@@ -48,7 +73,7 @@ function createMockSendCommandFn() {
      * @template {keyof LH.CrdpCommands} C
      * @param {C} command
      * @param {string} sessionId
-     * @param {RecursivePartial<LH.CrdpCommands[C]['returnType']>=} response
+     * @param {MockResponse<C>=} response
      * @param {number=} delay
      */
     mockResponseToSession(command, sessionId, response, delay) {
@@ -78,6 +103,10 @@ function createMockSendCommandFn() {
  *      returns the listener .
  */
 function createMockOnceFn() {
+  /**
+   * @template {keyof LH.CrdpEvents} E
+   * @type {Array<{event: E|any, response?: MockEvent<E>}>}
+   */
   const mockEvents = [];
   const mockFnImpl = jest.fn().mockImplementation((eventName, listener) => {
     const indexOfResponse = mockEvents.findIndex(entry => entry.event === eventName);
@@ -93,7 +122,7 @@ function createMockOnceFn() {
     /**
      * @template {keyof LH.CrdpEvents} E
      * @param {E} event
-     * @param {RecursivePartial<LH.CrdpEvents[E][0]>} response
+     * @param {MockEvent<E>} response
      */
     mockEvent(event, response) {
       mockEvents.push({event, response});
@@ -116,6 +145,10 @@ function createMockOnceFn() {
  * So it's good for .on w/ many events.
  */
 function createMockOnFn() {
+  /**
+   * @template {keyof LH.CrdpEvents} E
+   * @type {Array<{event: E, response?: MockEvent<E>}>}
+   */
   const mockEvents = [];
   const mockFnImpl = jest.fn().mockImplementation((eventName, listener) => {
     const events = mockEvents.filter(entry => entry.event === eventName);
@@ -137,7 +170,7 @@ function createMockOnFn() {
     /**
      * @template {keyof LH.CrdpEvents} E
      * @param {E} event
-     * @param {RecursivePartial<LH.CrdpEvents[E][0]>} response
+     * @param {MockEvent<E>} response
      */
     mockEvent(event, response) {
       mockEvents.push({event, response});

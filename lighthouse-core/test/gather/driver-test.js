@@ -129,9 +129,13 @@ async function flushAllTimersAndMicrotasks() {
  * @property {ReturnType<typeof createMockWaitForFn>} _waitForLoadEvent
  * @property {ReturnType<typeof createMockWaitForFn>} _waitForNetworkIdle
  * @property {ReturnType<typeof createMockWaitForFn>} _waitForCPUIdle
+ * @property {(...args: RecursivePartial<Parameters<Driver['gotoURL']>>) => ReturnType<Driver['gotoURL']>} gotoURL
+ * @property {(...args: RecursivePartial<Parameters<Driver['goOnline']>>) => ReturnType<Driver['goOnline']>} goOnline
 */
 
-/** @type {Driver & DriverMockMethods} */
+/** @typedef {Driver & DriverMockMethods} TestDriver */
+
+/** @type {TestDriver} */
 let driver;
 /** @type {Connection & {sendCommand: ReturnType<typeof createMockSendCommandFn>}} */
 let connectionStub;
@@ -143,7 +147,7 @@ beforeEach(() => {
   connectionStub.sendCommand = cmd => {
     throw new Error(`${cmd} not implemented`);
   };
-  // @ts-ignore - driver has a mocked version of on/once  implemented in each test
+  // @ts-ignore - driver has a mocked version of on/once implemented in each test
   driver = new Driver(connectionStub);
 });
 
@@ -448,8 +452,8 @@ describe('.getAppManifest', () => {
 describe('.goOffline', () => {
   it('should send offline emulation', async () => {
     connectionStub.sendCommand = createMockSendCommandFn()
-      .mockResponse('Network.enable', {})
-      .mockResponse('Network.emulateNetworkConditions', {});
+      .mockResponse('Network.enable')
+      .mockResponse('Network.emulateNetworkConditions');
 
     await driver.goOffline();
     const emulateArgs = connectionStub.sendCommand
@@ -476,7 +480,7 @@ describe('.gotoURL', () => {
   });
 
   it('will track redirects through gotoURL load', async () => {
-    const delay = _ => new Promise(resolve => setTimeout(resolve));
+    const delay = () => new Promise(resolve => setTimeout(resolve));
 
     class ReplayConnection extends Connection {
       connect() {
@@ -504,7 +508,8 @@ describe('.gotoURL', () => {
       }
     }
     const replayConnection = new ReplayConnection();
-    const driver = new Driver(replayConnection);
+
+    const driver = /** @type {TestDriver} */ (new Driver(replayConnection));
 
     // Redirect in log will go through
     const startUrl = 'http://en.wikipedia.org/';
@@ -522,7 +527,6 @@ describe('.gotoURL', () => {
         },
       },
     };
-
     const loadPromise = driver.gotoURL(startUrl, loadOptions);
 
     await flushAllTimersAndMicrotasks();
@@ -627,7 +631,6 @@ describe('.gotoURL', () => {
       driver._waitForNetworkIdle = createMockWaitForFn();
       driver._waitForCPUIdle = createMockWaitForFn();
 
-      // @ts-ignore: Allow partial passContext.
       const loadPromise = makePromiseInspectable(driver.gotoURL(url, {
         waitForLoad: true,
         passContext: {
@@ -982,12 +985,13 @@ describe('Domain.enable/disable State', () => {
 describe('Multi-target management', () => {
   it('enables the Network domain for iframes', async () => {
     connectionStub.sendCommand = createMockSendCommandFn()
-      .mockResponseToSession('Network.enable', '123', {})
-      .mockResponseToSession('Target.setAutoAttach', '123', {})
-      .mockResponseToSession('Runtime.runIfWaitingForDebugger', '123', {});
+      .mockResponseToSession('Network.enable', '123')
+      .mockResponseToSession('Target.setAutoAttach', '123')
+      .mockResponseToSession('Runtime.runIfWaitingForDebugger', '123');
 
     driver._eventEmitter.emit('Target.attachedToTarget', {
       sessionId: '123',
+      // @ts-ignore: Ignore partial targetInfo.
       targetInfo: {type: 'iframe'},
     });
     await flushAllTimersAndMicrotasks();
@@ -1001,10 +1005,11 @@ describe('Multi-target management', () => {
 
   it('ignores other target types, but still resumes them', async () => {
     connectionStub.sendCommand = createMockSendCommandFn()
-      .mockResponse('Target.sendMessageToTarget', {});
+      .mockResponse('Target.sendMessageToTarget');
 
     driver._eventEmitter.emit('Target.attachedToTarget', {
       sessionId: 'SW1',
+      // @ts-ignore: Ignore partial targetInfo.
       targetInfo: {type: 'service_worker'},
     });
     await flushAllTimersAndMicrotasks();
