@@ -180,8 +180,9 @@ describe('.getObjectProperty', () => {
 
 describe('.getRequestContent', () => {
   it('throws if getRequestContent takes too long', async () => {
+    // @ts-ignore
     connectionStub.sendCommand = jest.fn()
-      .mockImplementationOnce(() => new Promise(r => setTimeout(r), 5000));
+      .mockImplementationOnce(() => new Promise(r => setTimeout(r, 5000)));
 
     // Fail if we don't reach our two assertions in the catch block
     expect.assertions(2);
@@ -282,8 +283,9 @@ describe('.evaluateAsync', () => {
 
 describe('.sendCommand', () => {
   it('.sendCommand timesout when commands take too long', async () => {
+    // @ts-ignore
     connectionStub.sendCommand = jest.fn()
-      .mockImplementationOnce(() => new Promise(r => setTimeout(r), 5000));
+      .mockImplementationOnce(() => new Promise(r => setTimeout(r, 500)));
 
     driver.setNextProtocolTimeout(10000);
     const pageEnablePromise = driver.sendCommand('Page.enable');
