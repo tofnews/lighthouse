@@ -77,7 +77,7 @@ async function collectStacks(passContext) {
   })()`;
 
   /** @type {JSLibrary[]} */
-  const jsLibraries = await passContext.driver.evaluateAsync(expression, {useIsolation: true});
+  const jsLibraries = await passContext.driver.evaluateAsync(expression);
 
   return jsLibraries.map(lib => ({
     detector: /** @type {'js'} */ ('js'),
