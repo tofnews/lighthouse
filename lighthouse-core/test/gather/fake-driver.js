@@ -77,13 +77,15 @@ function makeFakeDriver({protocolGetVersionResponse}) {
       return Promise.resolve();
     },
     endTrace() {
-      return Promise.resolve(
-      require('../fixtures/traces/progressive-app.json')
-      );
+      // Minimal indirection so TypeScript doesn't crash trying to infer a type.
+      const modulePath = '../fixtures/traces/progressive-app.json';
+      return Promise.resolve(require(modulePath));
     },
     beginDevtoolsLog() {},
     endDevtoolsLog() {
-      return require('../fixtures/artifacts/perflog/defaultPass.devtoolslog.json');
+      // Minimal indirection so TypeScript doesn't crash trying to infer a type.
+      const modulePath = '../fixtures/artifacts/perflog/defaultPass.devtoolslog.json';
+      return require(modulePath);
     },
     blockUrlPatterns() {
       return Promise.resolve();
