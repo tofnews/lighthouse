@@ -55,18 +55,21 @@ describe('SourceMaps gatherer', () => {
         throw new Error('should only define map or fetchError, not both.');
       }
 
-      sendCommandMock.mockResponse('Runtime.evaluate', ({expression}) => {
-        // Check that the source map url was resolved correctly. It'll be somewhere
-        // in the code sent to Runtime.evaluate.
-        if (resolvedSourceMapUrl && !expression.includes(resolvedSourceMapUrl)) {
-          throw new Error(`did not request expected url: ${resolvedSourceMapUrl}`);
-        }
+      sendCommandMock
+        .mockResponse('Page.getResourceTree', {frameTree: {frame: {id: 1337}}})
+        .mockResponse('Page.createIsolatedWorld', {executionContextId: 1})
+        .mockResponse('Runtime.evaluate', ({expression}) => {
+          // Check that the source map url was resolved correctly. It'll be somewhere
+          // in the code sent to Runtime.evaluate.
+          if (resolvedSourceMapUrl && !expression.includes(resolvedSourceMapUrl)) {
+            throw new Error(`did not request expected url: ${resolvedSourceMapUrl}`);
+          }
 
-        const value = fetchError ?
-          Object.assign(new Error(), {message: fetchError, __failedInBrowser: true}) :
-          map;
-        return {result: {value}};
-      });
+          const value = fetchError ?
+            Object.assign(new Error(), {message: fetchError, __failedInBrowser: true}) :
+            map;
+          return {result: {value}};
+        });
     }
     const connectionStub = new Connection();
     connectionStub.sendCommand = sendCommandMock;
@@ -77,7 +80,13 @@ describe('SourceMaps gatherer', () => {
     const sourceMaps = new SourceMaps();
     await sourceMaps.beforePass({driver});
     jest.advanceTimersByTime(1);
-    return sourceMaps.afterPass({driver});
+    const result = await sourceMaps.afterPass({driver});
+
+    // Check that we used the isolated context when evaluating.
+    // const evaluateArgs = connectionStub.sendCommand.findInvocation('Runtime.evaluate');
+    // expect(evaluateArgs).toMatchObject({contextId: 1});
+
+    return result;
   }
 
   function makeJsonDataUrl(data) {
