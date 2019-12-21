@@ -39,6 +39,26 @@ class TestGathererNoArtifact extends Gatherer {
   afterPass() {}
 }
 
+class EmulationDriver extends Driver {
+  enableRuntimeEvents() {
+    return Promise.resolve();
+  }
+  enableAsyncStacks() {
+    return Promise.resolve();
+  }
+  assertNoSameOriginServiceWorkerClients() {
+    return Promise.resolve();
+  }
+  cacheNatives() {
+    return Promise.resolve();
+  }
+  registerPerformanceObserver() {
+    return Promise.resolve();
+  }
+  cleanBrowserCaches() {}
+  clearDataForOrigin() {}
+}
+
 const fakeDriver = require('./fake-driver.js');
 const fakeDriverUsingRealMobileDevice = fakeDriver.fakeDriverUsingRealMobileDevice;
 
@@ -60,26 +80,6 @@ function resetDefaultMockResponses() {
 }
 
 beforeEach(() => {
-  const EmulationDriver = class extends Driver {
-    enableRuntimeEvents() {
-      return Promise.resolve();
-    }
-    enableAsyncStacks() {
-      return Promise.resolve();
-    }
-    assertNoSameOriginServiceWorkerClients() {
-      return Promise.resolve();
-    }
-    cacheNatives() {
-      return Promise.resolve();
-    }
-    registerPerformanceObserver() {
-      return Promise.resolve();
-    }
-    cleanBrowserCaches() {}
-    clearDataForOrigin() {}
-  };
-
   connectionStub = new Connection();
   connectionStub.sendCommand = cmd => {
     throw new Error(`${cmd} not implemented`);
