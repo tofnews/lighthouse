@@ -8,6 +8,7 @@ import parseManifest = require('../lighthouse-core/lib/manifest-parser.js');
 import _LanternSimulator = require('../lighthouse-core/lib/dependency-graph/simulator/simulator.js');
 import _NetworkRequest = require('../lighthouse-core/lib/network-request.js');
 import speedline = require('speedline-core');
+import TextSourceMap = require('../lighthouse-core/lib/cdt/generated/SourceMap.js');
 
 type _TaskNode = import('../lighthouse-core/lib/tracehouse/main-thread-tasks.js').TaskNode;
 
@@ -293,7 +294,7 @@ declare global {
         rawMap: RawSourceMap;
         script: ScriptElement;
         networkRecord?: NetworkRequest;
-        map: import('../lighthouse-core/lib/cdt/generated/SourceMap.js').TextSourceMap;
+        map: TextSourceMap;
         sizes: {
           files: Record<string, number>;
           unmappedBytes: number;

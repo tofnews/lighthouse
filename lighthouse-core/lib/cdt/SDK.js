@@ -6,7 +6,7 @@
 'use strict';
 
 const SDK = {
-  ...require('./generated/SourceMap.js'),
+  TextSourceMap: require('./generated/SourceMap.js'),
 };
 
 /**
