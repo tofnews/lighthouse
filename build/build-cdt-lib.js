@@ -5,6 +5,8 @@
  */
 'use strict';
 
+/* eslint-disable no-console */
+
 const fs = require('fs');
 const ts = require('typescript');
 
@@ -13,7 +15,6 @@ const files = {
   'node_modules/chrome-devtools-frontend/front_end/sdk/SourceMap.js': 'SourceMap.js',
 };
 
-// eslint-disable-next-line no-console
 console.log('making modifications ...');
 
 for (const [inFilename, outFilename] of Object.entries(files)) {
@@ -45,6 +46,7 @@ for (const [inFilename, outFilename] of Object.entries(files)) {
     //
     /* Original:
 
+    let url = Common.ParsedURL.completeURL(this._baseURL, href) || href;
     const source = sourceMap.sourcesContent && sourceMap.sourcesContent[i];
     if (url === this._compiledURL && source) {
       url += Common.UIString('? [sm]')
@@ -101,6 +103,9 @@ for (const [inFilename, outFilename] of Object.entries(files)) {
     sourceFilePrinted += printer.printNode(ts.EmitHint.Unspecified, node, sourceFile) + '\n';
   });
 
+  // Similar to the reason for removing
+  // `url += Common.UIString('? [sm]')` (see comment above). The entries in `.mappings` should
+  // not have their url property modified.
   sourceFilePrinted =
     sourceFilePrinted.replace('Common.ParsedURL.completeURL(this._baseURL, href)', `''`);
 
