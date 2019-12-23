@@ -62,6 +62,14 @@ for (const [inFilename, outFilename] of Object.entries(files)) {
     */
     `url += Common.UIString('? [sm]')`,
   ];
+
+  // Verify that all the above code is present.
+  for (const codeFragment of [...classesToRemove, ...methodsToRemove, ...expressionsToRemove]) {
+    if (!codeTranspiledToCommonJS.includes(codeFragment)) {
+      throw new Error(`did not find expected code fragment: ${codeFragment}`);
+    }
+  }
+
   const printer = ts.createPrinter({newLine: ts.NewLineKind.LineFeed}, {
     substituteNode(hint, node) {
       let removeNode = false;
