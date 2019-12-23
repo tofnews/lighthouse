@@ -506,4 +506,4 @@ TextSourceMap._sourcesListSymbol = Symbol('sourcesList');
 
 
 
-module.exports = TextSourceMap;
+module.exports = TextSourceMap
