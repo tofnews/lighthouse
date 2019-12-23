@@ -16,8 +16,8 @@ const files = {
 // eslint-disable-next-line no-console
 console.log('making modifications ...');
 
-for (const [input, output] of Object.entries(files)) {
-  const code = fs.readFileSync(input, 'utf-8');
+for (const [inFilename, outFilename] of Object.entries(files)) {
+  const code = fs.readFileSync(inFilename, 'utf-8');
   const codeWithoutLegacyExports = code.substr(0, code.indexOf('/* Legacy exported object'));
   const codeTranspiledToCommonJS = ts.transpileModule(codeWithoutLegacyExports, {
     compilerOptions: {module: ts.ModuleKind.CommonJS, target: ts.ScriptTarget.ES2019},
@@ -110,5 +110,5 @@ for (const [input, output] of Object.entries(files)) {
     'const Common = require(\'../Common.js\')\n',
     sourceFilePrinted,
   ].join('');
-  fs.writeFileSync(`${outDir}/${output}`, modifiedFile);
+  fs.writeFileSync(`${outDir}/${outFilename}`, modifiedFile);
 }
