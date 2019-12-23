@@ -98,6 +98,8 @@ class BundleAnalysis {
       if (!SourceMap.map) continue;
       const {scriptUrl, map: rawMap} = SourceMap;
 
+      if (!rawMap.mappings) continue;
+
       const scriptElement = ScriptElements.find(s => s.src === scriptUrl);
       const networkRecord = networkRecords.find(r => r.url === scriptUrl);
       if (!scriptElement) continue;

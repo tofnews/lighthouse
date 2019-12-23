@@ -20,7 +20,9 @@ describe('BundleAnalysis computed artifact', () => {
   it('collates script element, network record, and source map', async () => {
     const networkRecords = [{url: 'https://www.example.com/app.js'}];
     const artifacts = {
-      SourceMaps: [{scriptUrl: 'https://www.example.com/app.js', map: {sources: ['index.js']}}],
+      SourceMaps: [{
+        scriptUrl: 'https://www.example.com/app.js', map: {sources: ['index.js'], mappings: 'AAAA'},
+      }],
       ScriptElements: [{src: 'https://www.example.com/app.js', content: ''}],
       devtoolsLogs: {defaultPass: networkRecordsToDevtoolsLog(networkRecords)},
     };
