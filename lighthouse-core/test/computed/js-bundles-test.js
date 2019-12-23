@@ -7,7 +7,7 @@
 
 /* eslint-env jest */
 const fs = require('fs');
-const BundleAnalysis = require('../../computed/bundle-analysis.js');
+const JSBundles = require('../../computed/js-bundles.js');
 const networkRecordsToDevtoolsLog = require('../network-records-to-devtools-log.js');
 
 function load(name) {
@@ -16,7 +16,7 @@ function load(name) {
   return {map: JSON.parse(mapData), content};
 }
 
-describe('BundleAnalysis computed artifact', () => {
+describe('JSBundles computed artifact', () => {
   it('collates script element, network record, and source map', async () => {
     const networkRecords = [{url: 'https://www.example.com/app.js'}];
     const artifacts = {
@@ -27,7 +27,7 @@ describe('BundleAnalysis computed artifact', () => {
       devtoolsLogs: {defaultPass: networkRecordsToDevtoolsLog(networkRecords)},
     };
     const context = {computedCache: new Map()};
-    const results = await BundleAnalysis.request(artifacts, context);
+    const results = await JSBundles.request(artifacts, context);
     expect(results).toHaveLength(1);
     const result = results[0];
     expect(result.rawMap).toBe(artifacts.SourceMaps[0].map);
@@ -46,7 +46,7 @@ describe('BundleAnalysis computed artifact', () => {
       devtoolsLogs: {defaultPass: networkRecordsToDevtoolsLog(networkRecords)},
     };
     const context = {computedCache: new Map()};
-    const results = await BundleAnalysis.request(artifacts, context);
+    const results = await JSBundles.request(artifacts, context);
 
     expect(results).toHaveLength(1);
     const result = results[0];
@@ -95,7 +95,7 @@ describe('BundleAnalysis computed artifact', () => {
       devtoolsLogs: {defaultPass: networkRecordsToDevtoolsLog(networkRecords)},
     };
     const context = {computedCache: new Map()};
-    const results = await BundleAnalysis.request(artifacts, context);
+    const results = await JSBundles.request(artifacts, context);
 
     expect(results).toHaveLength(1);
     const result = results[0];
@@ -139,7 +139,7 @@ describe('BundleAnalysis computed artifact', () => {
       devtoolsLogs: {defaultPass: networkRecordsToDevtoolsLog(networkRecords)},
     };
     const context = {computedCache: new Map()};
-    const results = await BundleAnalysis.request(artifacts, context);
+    const results = await JSBundles.request(artifacts, context);
 
     expect(results).toHaveLength(1);
     const result = results[0];
@@ -262,7 +262,7 @@ describe('BundleAnalysis computed artifact', () => {
         devtoolsLogs: {defaultPass: networkRecordsToDevtoolsLog(networkRecords)},
       };
       const context = {computedCache: new Map()};
-      const results = await BundleAnalysis.request(artifacts, context);
+      const results = await JSBundles.request(artifacts, context);
       const result = results[0];
       const entry = result.map.findEntry(0, 644);
       return {sizes: result.sizes, entry};

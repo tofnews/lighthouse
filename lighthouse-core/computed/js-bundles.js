@@ -46,13 +46,13 @@ function computeGeneratedFileSizes(map, content) {
 
     const line = lines[lineNum];
     if (line === null) {
-      log.error('BundleAnalysis', `${map.url()} mapping for line out of bounds: ${lineNum + 1}`);
+      log.error('JSBundles', `${map.url()} mapping for line out of bounds: ${lineNum + 1}`);
       return failureResult;
     }
 
     if (colNum > line.length) {
       // eslint-disable-next-line max-len
-      log.error('BundleAnalysis', `${map.url()} mapping for column out of bounds: ${lineNum + 1}:${colNum}`);
+      log.error('JSBundles', `${map.url()} mapping for column out of bounds: ${lineNum + 1}:${colNum}`);
       return failureResult;
     }
 
@@ -60,7 +60,7 @@ function computeGeneratedFileSizes(map, content) {
     if (lastColNum !== undefined) {
       if (lastColNum > line.length) {
         // eslint-disable-next-line max-len
-        log.error('BundleAnalysis', `${map.url()} mapping for last column out of bounds: ${lineNum + 1}:${lastColNum}`);
+        log.error('JSBundles', `${map.url()} mapping for last column out of bounds: ${lineNum + 1}:${lastColNum}`);
         return failureResult;
       }
       mappingLength = lastColNum - colNum;
@@ -80,7 +80,7 @@ function computeGeneratedFileSizes(map, content) {
   };
 }
 
-class BundleAnalysis {
+class JSBundles {
   /**
    * @param {Pick<LH.Artifacts, 'SourceMaps'|'ScriptElements'|'devtoolsLogs'>} artifacts
    * @param {LH.Audit.Context} context
@@ -126,4 +126,4 @@ class BundleAnalysis {
   }
 }
 
-module.exports = makeComputedArtifact(BundleAnalysis);
+module.exports = makeComputedArtifact(JSBundles);
