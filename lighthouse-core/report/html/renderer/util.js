@@ -96,7 +96,7 @@ class Util {
     // Set locale for number/date formatting and grab localized renderer strings from the LHR.
     Util.setNumberDateLocale(clone.configSettings.locale);
     if (clone.i18n && clone.i18n.rendererFormattedStrings) {
-      Util.updateAllUIStrings(clone.i18n.rendererFormattedStrings);
+      Util.setDefaultUIStrings(clone.i18n.rendererFormattedStrings);
     }
 
     // For convenience, smoosh all AuditResults into their auditRef (which has just weight & group)
@@ -125,14 +125,14 @@ class Util {
     return clone;
   }
 
-
   /**
+   * Set missing renderer strings to default (english) values.
    * @param {LH.I18NRendererStrings} rendererFormattedStrings
    */
-  static updateAllUIStrings(rendererFormattedStrings) {
-    // TODO(i18n): don't mutate these here but on the LHR and pass that around everywhere
-    for (const [key, value] of Object.entries(rendererFormattedStrings)) {
-      Util.UIStrings[key] = value;
+  static setDefaultUIStrings(rendererFormattedStrings) {
+    for (const [key_, value] of Object.entries(Util.UIStrings)) {
+      const key = /** @type {keyof typeof Util.UIStrings} */ (key_);
+      rendererFormattedStrings[key] = rendererFormattedStrings[key] || value;
     }
   }
 
@@ -626,7 +626,6 @@ Util.numberFormatter = new Intl.NumberFormat(Util.numberDateLocale);
 
 /**
  * Report-renderer-specific strings.
- * @type {LH.I18NRendererStrings}
  */
 Util.UIStrings = {
   /** Disclaimer shown to users below the metric values (First Contentful Paint, Time to Interactive, etc) to warn them that the numbers they see will likely change slightly the next time they run Lighthouse. */

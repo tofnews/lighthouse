@@ -25,12 +25,17 @@ const URL_PREFIXES = ['http://', 'https://', 'data:'];
 class DetailsRenderer {
   /**
    * @param {DOM} dom
+   * @param {LH.ReportResult} report
    */
-  constructor(dom) {
-    /** @type {DOM} */
+  constructor(dom, report) {
     this._dom = dom;
+    this._report = report;
     /** @type {ParentNode} */
     this._templateContext; // eslint-disable-line no-unused-expressions
+  }
+
+  get strings() {
+    return this._report.i18n.rendererFormattedStrings;
   }
 
   /**

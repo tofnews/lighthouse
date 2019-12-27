@@ -44,18 +44,12 @@ class ReportRenderer {
    * @return {Element}
    */
   renderReport(result, container) {
-    // Mutate the UIStrings if necessary (while saving originals)
-    const originalUIStrings = JSON.parse(JSON.stringify(Util.UIStrings));
-
     this._dom.setLighthouseChannel(result.configSettings.channel || 'unknown');
 
     const report = Util.prepareReportResult(result);
 
     container.textContent = ''; // Remove previous report.
     container.appendChild(this._renderReport(report));
-
-    // put the UIStrings back into original state
-    Util.updateAllUIStrings(originalUIStrings);
 
     return container;
   }
@@ -136,7 +130,7 @@ class ReportRenderer {
 
     const container = this._dom.cloneTemplate('#tmpl-lh-warnings--toplevel', this._templateContext);
     const message = this._dom.find('.lh-warnings__msg', container);
-    message.textContent = Util.UIStrings.toplevelWarningsMessage;
+    message.textContent = report.i18n.rendererFormattedStrings.toplevelWarningsMessage;
 
     const warnings = this._dom.find('ul', container);
     for (const warningString of report.runWarnings) {
@@ -185,7 +179,7 @@ class ReportRenderer {
    * @return {DocumentFragment}
    */
   _renderReport(report) {
-    const detailsRenderer = new DetailsRenderer(this._dom);
+    const detailsRenderer = new DetailsRenderer(this._dom, report);
     const categoryRenderer = new CategoryRenderer(this._dom, detailsRenderer);
     categoryRenderer.setTemplateContext(this._templateContext);
 
@@ -248,9 +242,6 @@ class ReportRenderer {
     return reportFragment;
   }
 }
-
-/** @type {LH.I18NRendererStrings} */
-ReportRenderer._UIStringsStash = {};
 
 if (typeof module !== 'undefined' && module.exports) {
   module.exports = ReportRenderer;
