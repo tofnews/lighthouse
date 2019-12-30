@@ -13,7 +13,8 @@ const Audit = require('../audit.js');
 const i18n = require('../../lib/i18n/i18n.js');
 const BaseNode = require('../../lib/dependency-graph/base-node.js');
 const ByteEfficiencyAudit = require('./byte-efficiency-audit.js');
-const UnusedCSS = require('./unused-css-rules.js');
+const NetworkRecords = require('../../computed/network-records.js');
+const UnusedCSS = require('../../computed/unused-css.js');
 const NetworkRequest = require('../../lib/network-request.js');
 const TraceOfTab = require('../../computed/trace-of-tab.js');
 const LoadSimulator = require('../../computed/load-simulator.js');
@@ -84,10 +85,11 @@ class RenderBlockingResources extends Audit {
   static async computeResults(artifacts, context) {
     const trace = artifacts.traces[Audit.DEFAULT_PASS];
     const devtoolsLog = artifacts.devtoolsLogs[Audit.DEFAULT_PASS];
+    const networkRecords = await NetworkRecords.request(devtoolsLog, context);
     const simulatorData = {devtoolsLog, settings: context.settings};
     const traceOfTab = await TraceOfTab.request(trace, context);
     const simulator = await LoadSimulator.request(simulatorData, context);
-    const wastedCssBytes = await RenderBlockingResources.computeWastedCSSBytes(artifacts, context);
+    const wastedCssBytes = await RenderBlockingResources.computeWastedCSSBytes(artifacts, networkRecords, context);
 
     const metricSettings = {throttlingMethod: 'simulate'};
     const metricComputationData = {trace, devtoolsLog, simulator, settings: metricSettings};
@@ -181,17 +183,20 @@ class RenderBlockingResources extends Audit {
 
   /**
    * @param {LH.Artifacts} artifacts
+   * @param {LH.Artifacts.NetworkRequest[]} networkRecords
    * @param {LH.Audit.Context} context
    * @return {Promise<Map<string, number>>}
    */
-  static async computeWastedCSSBytes(artifacts, context) {
+  static async computeWastedCSSBytes(artifacts, networkRecords, context) {
     const wastedBytesByUrl = new Map();
     try {
-      const results = await UnusedCSS.audit(artifacts, context);
-      if (results.details && results.details.type === 'opportunity') {
-        for (const item of results.details.items) {
-          wastedBytesByUrl.set(item.url, item.wastedBytes);
-        }
+      const unusedCssItems = await UnusedCSS.request({
+        CSSUsage: artifacts.CSSUsage,
+        URL: artifacts.URL,
+        networkRecords,
+      }, context);
+      for (const item of unusedCssItems) {
+        wastedBytesByUrl.set(item.url, item.wastedBytes);
       }
     } catch (_) {}
 
