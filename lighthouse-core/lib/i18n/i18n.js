@@ -337,7 +337,7 @@ function getRendererFormattedStrings(locale) {
   if (!localeMessages) throw new Error(`Unsupported locale '${locale}'`);
 
   const icuMessageIds = Object.keys(localeMessages).filter(f => f.includes('core/report/html/'));
-  /** @type {LH.I18NRendererStrings} */
+  /** @type {Record<string, string>} */
   const strings = {};
   for (const icuMessageId of icuMessageIds) {
     const [filename, varName] = icuMessageId.split(' | ');
@@ -345,6 +345,7 @@ function getRendererFormattedStrings(locale) {
     strings[varName] = localeMessages[icuMessageId].message;
   }
 
+  // @ts-ignore
   return strings;
 }
 

@@ -25,7 +25,7 @@
 
 /** @typedef {import('./dom.js')} DOM */
 
-/* globals self, Util, DetailsRenderer, CategoryRenderer, PerformanceCategoryRenderer, PwaCategoryRenderer */
+/* globals self, Util, DetailsRenderer, CategoryRenderer, I18n, PerformanceCategoryRenderer, PwaCategoryRenderer */
 
 class ReportRenderer {
   /**
@@ -98,7 +98,7 @@ class ReportRenderer {
     const envValues = Util.getEnvironmentDisplayValues(report.configSettings || {});
     [
       {name: 'URL', description: report.finalUrl},
-      {name: 'Fetch time', description: Util.formatDateTime(report.fetchTime)},
+      {name: 'Fetch time', description: Util.i18n.formatDateTime(report.fetchTime)},
       ...envValues,
       {name: 'User agent (host)', description: report.userAgent},
       {name: 'User agent (network)', description: report.environment &&
@@ -179,7 +179,12 @@ class ReportRenderer {
    * @return {DocumentFragment}
    */
   _renderReport(report) {
-    const detailsRenderer = new DetailsRenderer(this._dom, report);
+    const i18n = new I18n(report.configSettings.locale);
+    // Set missing renderer strings to default (english) values.
+    i18n.setStrings({...Util.UIStrings, ...report.i18n.rendererFormattedStrings});
+    Util.i18n = i18n;
+
+    const detailsRenderer = new DetailsRenderer(this._dom);
     const categoryRenderer = new CategoryRenderer(this._dom, detailsRenderer);
     categoryRenderer.setTemplateContext(this._templateContext);
 

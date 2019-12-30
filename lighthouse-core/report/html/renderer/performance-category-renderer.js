@@ -73,7 +73,7 @@ class PerformanceCategoryRenderer extends CategoryRenderer {
     const displayEl = this.dom.find('.lh-audit__display-text', element);
     const sparklineWidthPct = `${details.overallSavingsMs / scale * 100}%`;
     this.dom.find('.lh-sparkline__bar', element).style.width = sparklineWidthPct;
-    displayEl.textContent = Util.formatSeconds(details.overallSavingsMs, 0.01);
+    displayEl.textContent = Util.i18n.formatSeconds(details.overallSavingsMs, 0.01);
 
     // Set [title] tooltips
     if (audit.result.displayValue) {
@@ -112,7 +112,7 @@ class PerformanceCategoryRenderer extends CategoryRenderer {
    * @override
    */
   render(category, groups, environment) {
-    const strings = this.detailsRenderer.strings;
+    const strings = Util.i18n.strings;
     const element = this.dom.createElement('div', 'lh-category');
     if (environment === 'PSI') {
       const gaugeEl = this.dom.createElement('div', 'lh-score__gauge');

@@ -45,10 +45,10 @@ class CategoryRenderer {
    */
   get _clumpTitles() {
     return {
-      warning: this.detailsRenderer.strings.warningAuditsGroupTitle,
-      manual: this.detailsRenderer.strings.manualAuditsGroupTitle,
-      passed: this.detailsRenderer.strings.passedAuditsGroupTitle,
-      notApplicable: this.detailsRenderer.strings.notApplicableAuditsGroupTitle,
+      warning: Util.i18n.strings.warningAuditsGroupTitle,
+      manual: Util.i18n.strings.manualAuditsGroupTitle,
+      passed: Util.i18n.strings.passedAuditsGroupTitle,
+      notApplicable: Util.i18n.strings.notApplicableAuditsGroupTitle,
     };
   }
 
@@ -68,7 +68,7 @@ class CategoryRenderer {
    * @return {Element}
    */
   populateAuditValues(audit, tmpl) {
-    const strings = this.detailsRenderer.strings;
+    const strings = Util.i18n.strings;
     const auditEl = this.dom.find('.lh-audit', tmpl);
     auditEl.id = audit.result.id;
     const scoreDisplayMode = audit.result.scoreDisplayMode;
@@ -289,7 +289,7 @@ class CategoryRenderer {
 
     const summaryInnerEl = this.dom.find('.lh-audit-group__summary', clumpElement);
     const chevronEl = summaryInnerEl.appendChild(this._createChevron());
-    chevronEl.title = this.detailsRenderer.strings.auditGroupExpandTooltip;
+    chevronEl.title = Util.i18n.strings.auditGroupExpandTooltip;
 
     const headerEl = this.dom.find('.lh-audit-group__header', clumpElement);
     const title = this._clumpTitles[clumpId];
@@ -347,7 +347,7 @@ class CategoryRenderer {
     percentageEl.textContent = scoreOutOf100.toString();
     if (category.score === null) {
       percentageEl.textContent = '?';
-      percentageEl.title = this.detailsRenderer.strings.errorLabel;
+      percentageEl.title = Util.i18n.strings.errorLabel;
     }
 
     this.dom.find('.lh-gauge__label', tmpl).textContent = category.title;

@@ -25,17 +25,11 @@ const URL_PREFIXES = ['http://', 'https://', 'data:'];
 class DetailsRenderer {
   /**
    * @param {DOM} dom
-   * @param {LH.ReportResult} report
    */
-  constructor(dom, report) {
+  constructor(dom) {
     this._dom = dom;
-    this._report = report;
     /** @type {ParentNode} */
     this._templateContext; // eslint-disable-line no-unused-expressions
-  }
-
-  get strings() {
-    return this._report.i18n.rendererFormattedStrings;
   }
 
   /**
@@ -81,7 +75,7 @@ class DetailsRenderer {
    */
   _renderBytes(details) {
     // TODO: handle displayUnit once we have something other than 'kb'
-    const value = Util.formatBytesToKB(details.value, details.granularity);
+    const value = Util.i18n.formatBytesToKB(details.value, details.granularity);
     return this._renderText(value);
   }
 
@@ -90,9 +84,9 @@ class DetailsRenderer {
    * @return {Element}
    */
   _renderMilliseconds(details) {
-    let value = Util.formatMilliseconds(details.value, details.granularity);
+    let value = Util.i18n.formatMilliseconds(details.value, details.granularity);
     if (details.displayUnit === 'duration') {
-      value = Util.formatDuration(details.value);
+      value = Util.i18n.formatDuration(details.value);
     }
 
     return this._renderText(value);
