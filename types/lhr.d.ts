@@ -7,8 +7,6 @@
 import LHError = require('../lighthouse-core/lib/lh-error.js');
 import Util = require('../lighthouse-core/report/html/renderer/util.js');
 
-type a = keyof typeof Util['UIStrings'];
-
 declare global {
   module LH {
     export type LighthouseError = LHError;
