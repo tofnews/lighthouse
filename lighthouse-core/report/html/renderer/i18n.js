@@ -27,7 +27,9 @@ class I18n {
    * @param {LH.I18NRendererStrings=} strings
    */
   constructor(locale, strings) {
-    this.setNumberDateLocale(locale);
+    // When testing, use a locale with more exciting numeric formatting.
+    if (locale === 'en-XA') locale = 'de';
+
     this._numberDateLocale = locale;
     this._numberFormatter = new Intl.NumberFormat(locale);
     this._strings = /** @type {LH.I18NRendererStrings} */ (strings || {});
@@ -130,18 +132,6 @@ class I18n {
     });
 
     return parts.join(' ');
-  }
-
-  /**
-   * Set the locale to be used for I18n's number and date formatting functions.
-   * @param {LH.Locale} locale
-   */
-  setNumberDateLocale(locale) {
-    // When testing, use a locale with more exciting numeric formatting
-    if (locale === 'en-XA') locale = 'de';
-
-    this._numberDateLocale = locale;
-    this._numberFormatter = new Intl.NumberFormat(locale);
   }
 }
 
