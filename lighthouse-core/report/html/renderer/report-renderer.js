@@ -130,7 +130,7 @@ class ReportRenderer {
 
     const container = this._dom.cloneTemplate('#tmpl-lh-warnings--toplevel', this._templateContext);
     const message = this._dom.find('.lh-warnings__msg', container);
-    message.textContent = report.i18n.rendererFormattedStrings.toplevelWarningsMessage;
+    message.textContent = Util.i18n.strings.toplevelWarningsMessage;
 
     const warnings = this._dom.find('ul', container);
     for (const warningString of report.runWarnings) {
@@ -179,9 +179,11 @@ class ReportRenderer {
    * @return {DocumentFragment}
    */
   _renderReport(report) {
-    const i18n = new I18n(report.configSettings.locale);
-    // Set missing renderer strings to default (english) values.
-    i18n.setStrings({...Util.UIStrings, ...report.i18n.rendererFormattedStrings});
+    const i18n = new I18n(report.configSettings.locale, {
+      // Set missing renderer strings to default (english) values.
+      ...Util.UIStrings,
+      ...report.i18n.rendererFormattedStrings,
+    });
     Util.i18n = i18n;
 
     const detailsRenderer = new DetailsRenderer(this._dom);

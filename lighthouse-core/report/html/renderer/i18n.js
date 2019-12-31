@@ -18,24 +18,19 @@
 
 /* globals self, URL */
 
-// Not named `NBSP` because that creates a duplicate identifier (util.js). 
+// Not named `NBSP` because that creates a duplicate identifier (util.js).
 const NBSP2 = '\xa0';
 
 class I18n {
   /**
    * @param {LH.Locale} locale
+   * @param {LH.I18NRendererStrings=} strings
    */
-  constructor(locale) {
+  constructor(locale, strings) {
     this.setNumberDateLocale(locale);
     this._numberDateLocale = locale;
     this._numberFormatter = new Intl.NumberFormat(locale);
-  }
-
-  /**
-   * @param {LH.I18NRendererStrings} strings
-   */
-  setStrings(strings) {
-    this._strings = strings;
+    this._strings = /** @type {LH.I18NRendererStrings} */ (strings || {});
   }
 
   get strings() {
