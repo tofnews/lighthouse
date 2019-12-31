@@ -7,6 +7,7 @@
 
 const makeComputedArtifact = require('./computed-artifact.js');
 const ByteEfficiencyAudit = require('../audits/byte-efficiency/byte-efficiency-audit.js');
+const NetworkRecords = require('./network-records.js');
 
 const PREVIEW_LENGTH = 100;
 
@@ -134,16 +135,18 @@ class UnusedCSS {
   }
 
   /**
-   * @param {{CSSUsage: LH.Artifacts['CSSUsage'], URL: LH.Artifacts['URL'], networkRecords: Array<LH.Artifacts.NetworkRequest>}} data
+   * @param {{CSSUsage: LH.Artifacts['CSSUsage'], URL: LH.Artifacts['URL'], devtoolsLog: LH.DevtoolsLog}} data
+   * @param {LH.Audit.Context} context
    * @return {Promise<LH.Audit.ByteEfficiencyItem[]>}
   */
-  static compute_(data) {
-    const {CSSUsage, URL, networkRecords} = data;
+  static async compute_(data, context) {
+    const {CSSUsage, URL, devtoolsLog} = data;
+    const networkRecords = await NetworkRecords.request(devtoolsLog, context)
     const indexedSheets = UnusedCSS.indexStylesheetsById(CSSUsage.stylesheets, networkRecords);
     UnusedCSS.indexUsedRules(CSSUsage.rules, indexedSheets);
     const items = Object.keys(indexedSheets)
       .map(sheetId => UnusedCSS.mapSheetToResult(indexedSheets[sheetId], URL.finalUrl));
-    return Promise.resolve(items);
+    return items;
   }
 }
 
