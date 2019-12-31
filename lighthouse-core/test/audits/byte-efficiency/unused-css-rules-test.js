@@ -21,7 +21,7 @@ describe('Best Practices: unused css rules audit', () => {
   }
 
   describe('#audit', () => {
-    const networkRecords = [
+    const defaultNetworkRecords = [
       {
         url: 'file://a.css',
         transferSize: 100 * 1024,
@@ -32,7 +32,7 @@ describe('Best Practices: unused css rules audit', () => {
 
     const context = {computedCache: new Map()};
 
-    function getArtifacts({CSSUsage}) {
+    function getArtifacts({CSSUsage, networkRecords = defaultNetworkRecords}) {
       return {
         devtoolsLogs: {defaultPass: networkRecordsToDevtoolsLog(networkRecords)},
         URL: {finalUrl: ''},
@@ -47,7 +47,7 @@ describe('Best Practices: unused css rules audit', () => {
     it('ignores missing stylesheets', () => {
       return UnusedCSSAudit.audit_(getArtifacts({
         CSSUsage: {rules: [{styleSheetId: 'a', used: false}], stylesheets: []},
-      }), networkRecords, context).then(result => {
+      }), defaultNetworkRecords, context).then(result => {
         assert.equal(result.items.length, 0);
       });
     });
@@ -68,7 +68,7 @@ describe('Best Practices: unused css rules audit', () => {
             content: '.my.favorite.selector { rule: content; }',
           },
         ]},
-      }), networkRecords, context).then(result => {
+      }), defaultNetworkRecords, context).then(result => {
         assert.equal(result.items.length, 0);
       });
     });
@@ -92,7 +92,7 @@ describe('Best Practices: unused css rules audit', () => {
             content: `${generate('123', 450)}`, // will be filtered out
           },
         ]},
-      }), networkRecords, context).then(result => {
+      }), defaultNetworkRecords, context).then(result => {
         assert.equal(result.items.length, 2);
         assert.equal(result.items[0].totalBytes, 100 * 1024);
         assert.equal(result.items[1].totalBytes, 40000 * 3 * 0.2);
@@ -102,16 +102,7 @@ describe('Best Practices: unused css rules audit', () => {
     });
 
     it('handles phantom network records without size data', async () => {
-      const result = await UnusedCSSAudit.audit_(getArtifacts({
-        CSSUsage: {rules: [
-          {styleSheetId: 'a', used: true, startOffset: 0, endOffset: 60000}, // 40000 * 3 * 50% = 60000
-        ], stylesheets: [
-          {
-            header: {styleSheetId: 'a', sourceURL: 'file://a.html'},
-            content: `${generate('123', 40000)}`, // stylesheet size of 40000 * 3 uncompressed bytes
-          },
-        ]},
-      }), [
+      const networkRecords = [
         {
           url: 'file://a.html',
           transferSize: 100 * 1024 * 0.5, // compression ratio of 0.5
@@ -124,8 +115,22 @@ describe('Best Practices: unused css rules audit', () => {
           resourceSize: 0,
           resourceType: 'Document',
         },
-      ], context);
+      ];
+      const artifacts = getArtifacts({
+        CSSUsage: {
+          rules: [
+            {styleSheetId: 'a', used: true, startOffset: 0, endOffset: 60000}, // 40000 * 3 * 50% = 60000
+          ], stylesheets: [
+            {
+              header: {styleSheetId: 'a', sourceURL: 'file://a.html'},
+              content: `${generate('123', 40000)}`, // stylesheet size of 40000 * 3 uncompressed bytes
+            },
+          ],
+        },
+        networkRecords,
+      });
 
+      const result = await UnusedCSSAudit.audit_(artifacts, networkRecords, context);
       expect(result.items).toMatchObject([
         {totalBytes: 40000 * 3 * 0.5, wastedPercent: 50},
       ]);
@@ -158,7 +163,7 @@ describe('Best Practices: unused css rules audit', () => {
             content: '       ',
           },
         ]},
-      }), networkRecords, context).then(result => {
+      }), defaultNetworkRecords, context).then(result => {
         assert.equal(result.items.length, 1);
         assert.equal(Math.floor(result.items[0].wastedPercent), 33);
       });

@@ -141,9 +141,10 @@ class UnusedCSS {
   */
   static async compute_(data, context) {
     const {CSSUsage, URL, devtoolsLog} = data;
-    const networkRecords = await NetworkRecords.request(devtoolsLog, context)
+    const networkRecords = await NetworkRecords.request(devtoolsLog, context);
     const indexedSheets = UnusedCSS.indexStylesheetsById(CSSUsage.stylesheets, networkRecords);
     UnusedCSS.indexUsedRules(CSSUsage.rules, indexedSheets);
+
     const items = Object.keys(indexedSheets)
       .map(sheetId => UnusedCSS.mapSheetToResult(indexedSheets[sheetId], URL.finalUrl));
     return items;

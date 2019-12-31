@@ -40,11 +40,11 @@ class UnusedCSSRules extends ByteEfficiencyAudit {
 
   /**
    * @param {LH.Artifacts} artifacts
-   * @param {LH.Artifacts.NetworkRequest[]} networkRecords
+   * @param {LH.Artifacts.NetworkRequest[]} _
    * @param {LH.Audit.Context} context
    * @return {Promise<ByteEfficiencyAudit.ByteEfficiencyProduct>}
    */
-  static async audit_(artifacts, networkRecords, context) {
+  static async audit_(artifacts, _, context) {
     const unusedCssItems = await UnusedCSS.request({
       CSSUsage: artifacts.CSSUsage,
       URL: artifacts.URL,
