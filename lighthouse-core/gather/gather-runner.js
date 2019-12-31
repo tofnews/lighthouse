@@ -13,6 +13,7 @@ const NetworkAnalyzer = require('../lib/dependency-graph/simulator/network-analy
 const NetworkRecorder = require('../lib/network-recorder.js');
 const constants = require('../config/constants.js');
 const i18n = require('../lib/i18n/i18n.js');
+const URL = require('../lib/url-shim.js');
 
 const UIStrings = {
   /**
@@ -504,7 +505,8 @@ class GatherRunner {
 
     // Copy redirected URL to artifact.
     baseArtifacts.URL.finalUrl = passContext.url;
-    if (baseArtifacts.URL.requestedUrl !== baseArtifacts.URL.finalUrl) {
+    /* eslint-disable max-len */
+    if (!URL.equalWithExcludedFragments(baseArtifacts.URL.requestedUrl, baseArtifacts.URL.finalUrl)) {
       baseArtifacts.LighthouseRunWarnings.push(str_(UIStrings.warningRedirected, {
         requested: baseArtifacts.URL.requestedUrl,
         final: baseArtifacts.URL.finalUrl,
