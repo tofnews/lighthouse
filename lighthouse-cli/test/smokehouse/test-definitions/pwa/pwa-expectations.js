@@ -89,7 +89,7 @@ module.exports = [
 
   {
     lhr: {
-      requestedUrl: 'https://www.chromestatus.com/',
+      requestedUrl: 'https://www.chromestatus.com/features',
       finalUrl: 'https://www.chromestatus.com/features',
       audits: {
         'is-on-https': {
@@ -102,7 +102,7 @@ module.exports = [
           score: 1,
         },
         'works-offline': {
-          score: 0,
+          score: 1,
         },
         'offline-start-url': {
           score: 1,
